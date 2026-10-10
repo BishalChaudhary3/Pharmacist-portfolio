@@ -1,0 +1,382 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "nodejs"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  EDITOR
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SCHEDULED
+}
+
+enum PageSectionType {
+  HERO
+  ABOUT_PREVIEW
+  EXPERTISE
+  FEATURED_ARTICLES
+  EXPERIENCE_PREVIEW
+  CTA
+}
+
+// ─── User & Auth ─────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  supabaseId    String    @unique
+  email         String    @unique
+  name          String?
+  role          Role      @default(EDITOR)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  articles      Article[]
+  media         Media[]
+  contactMessages ContactMessage[]
+
+  @@map("users")
+}
+
+// ─── Profile ─────────────────────────────────────────────
+
+model Profile {
+  id              String    @id @default(cuid())
+  fullName        String    @default("[PHARMACIST_NAME]")
+  professionalTitle String  @default("Pharmacist & Healthcare Writer")
+  shortBio        String?   @db.Text
+  longBio         String?   @db.Text
+  profilePhotoId  String?
+  profilePhoto    Media?    @relation("ProfilePhoto", fields: [profilePhotoId], references: [id])
+  email           String?
+  phone           String?
+  location        String?
+  linkedinUrl     String?
+  instagramUrl    String?
+  researchGateUrl String?
+  orcidUrl        String?
+  otherLinks      Json?
+  cvMediaId       String?
+  cvMedia         Media?    @relation("CVMedia", fields: [cvMediaId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("profiles")
+}
+
+// ─── Site Settings ───────────────────────────────────────
+
+model SiteSettings {
+  id                    String    @id @default(cuid())
+  siteName              String    @default("[PHARMACIST_NAME]")
+  siteDescription       String?
+  email                 String?
+  phone                 String?
+  location              String?
+  linkedin              String?
+  instagram             String?
+  researchGate          String?
+  orcid                 String?
+  copyright             String?
+  medicalDisclaimer     String?   @db.Text
+  defaultSeoTitle       String?
+  defaultSeoDescription String?
+  defaultOgImageId      String?
+  defaultOgImage        Media?    @relation("DefaultOgImage", fields: [defaultOgImageId], references: [id])
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("site_settings")
+}
+
+// ─── Pages & Sections ────────────────────────────────────
+
+model Page {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  sections    PageSection[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("pages")
+}
+
+model PageSection {
+  id           String          @id @default(cuid())
+  pageId       String
+  page         Page            @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type         PageSectionType
+  displayOrder Int             @default(0)
+  enabled      Boolean         @default(true)
+  content      Json            @default("{}")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@unique([pageId, type])
+  @@map("page_sections")
+}
+
+// ─── Experience ──────────────────────────────────────────
+
+model Experience {
+  id              String    @id @default(cuid())
+  title           String
+  organization    String
+  location        String?
+  startDate       DateTime
+  endDate         DateTime?
+  isCurrent       Boolean   @default(false)
+  description     String?   @db.Text
+  logoId          String?
+  logo            Media?    @relation("ExperienceLogo", fields: [logoId], references: [id])
+  displayOrder    Int       @default(0)
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("experiences")
+}
+
+// ─── Education ───────────────────────────────────────────
+
+model Education {
+  id              String    @id @default(cuid())
+  institution     String
+  degree          String
+  field           String?
+  location        String?
+  startDate       DateTime
+  endDate         DateTime?
+  description     String?   @db.Text
+  logoId          String?
+  logo            Media?    @relation("EducationLogo", fields: [logoId], references: [id])
+  displayOrder    Int       @default(0)
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("education")
+}
+
+// ─── Certifications ──────────────────────────────────────
+
+model Certification {
+  id                String    @id @default(cuid())
+  name              String
+  issuingOrganization String
+  issueDate         DateTime
+  expiryDate        DateTime?
+  credentialId      String?
+  credentialUrl     String?
+  certificateMediaId String?
+  certificateMedia  Media?    @relation("CertificateMedia", fields: [certificateMediaId], references: [id])
+  description       String?   @db.Text
+  displayOrder      Int       @default(0)
+  enabled           Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("certifications")
+}
+
+// ─── Expertise ───────────────────────────────────────────
+
+model Expertise {
+  id              String    @id @default(cuid())
+  title           String
+  shortDescription String?
+  iconIdentifier  String?   @default("pill")
+  displayOrder    Int       @default(0)
+  enabled         Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("expertise")
+}
+
+// ─── Articles ────────────────────────────────────────────
+
+model Article {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  excerpt         String?       @db.Text
+  content         String        @db.Text
+  coverImageId    String?
+  coverImage      Media?        @relation("ArticleCover", fields: [coverImageId], references: [id])
+  status          ArticleStatus @default(DRAFT)
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+  authorId        String
+  author          User          @relation(fields: [authorId], references: [id])
+  categoryId      String?
+  category        Category?     @relation(fields: [categoryId], references: [id])
+  readingTime     Int?          // calculated in minutes
+  isFeatured      Boolean       @default(false)
+  featuredOrder   Int           @default(0)
+  seoTitle        String?
+  seoDescription  String?
+  canonicalUrl    String?
+  ogImageId       String?
+  ogImage         Media?        @relation("ArticleOgImage", fields: [ogImageId], references: [id])
+
+  tags            ArticleTag[]
+  references      ArticleReference[]
+  revisions       ArticleRevision[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@map("articles")
+}
+
+model ArticleRevision {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  title     String
+  content   String   @db.Text
+  excerpt   String?  @db.Text
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@map("article_revisions")
+}
+
+// ─── Categories ──────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  displayOrder Int      @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  articles    Article[]
+
+  @@map("categories")
+}
+
+// ─── Tags ────────────────────────────────────────────────
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  createdAt DateTime     @default(now())
+
+  articles  ArticleTag[]
+
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+// ─── Article References ──────────────────────────────────
+
+model ArticleReference {
+  id              String    @id @default(cuid())
+  articleId       String
+  article         Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  title           String
+  source          String?
+  url             String?
+  publicationDate DateTime?
+  displayOrder    Int       @default(0)
+
+  @@map("article_references")
+}
+
+// ─── Media ───────────────────────────────────────────────
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  storagePath  String
+  mimeType     String
+  size         Int
+  url          String
+  altText      String?
+  caption      String?
+  createdAt    DateTime @default(now())
+  uploadedBy   String
+  uploader     User     @relation(fields: [uploadedBy], references: [id])
+
+  articleCovers    Article[]          @relation("ArticleCover")
+  articleOgImages  Article[]          @relation("ArticleOgImage")
+  profilePhotos    Profile[]          @relation("ProfilePhoto")
+  cvFiles          Profile[]          @relation("CVMedia")
+  experienceLogos  Experience[]       @relation("ExperienceLogo")
+  educationLogos   Education[]        @relation("EducationLogo")
+  certificates     Certification[]    @relation("CertificateMedia")
+  defaultOgImages  SiteSettings[]     @relation("DefaultOgImage")
+
+  @@map("media")
+}
+
+// ─── Navigation ──────────────────────────────────────────
+
+model NavigationItem {
+  id           String    @id @default(cuid())
+  label        String
+  url          String
+  isExternal   Boolean   @default(false)
+  displayOrder Int       @default(0)
+  enabled      Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("navigation_items")
+}
+
+// ─── Contact Messages ────────────────────────────────────
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  status    String   @default("UNREAD") // UNREAD, READ, ARCHIVED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@map("contact_messages")
+}
+
+// ─── Redirects (for slug history) ────────────────────────
+
+model Redirect {
+  id        String   @id @default(cuid())
+  fromPath  String   @unique
+  toPath    String
+  createdAt DateTime @default(now())
+
+  @@map("redirects")
+}
