@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.1.9", "localhost", "127.0.0.1"],
 
   experimental: {
-    // ✅ Renamed and moved inside experimental
     proxyClientMaxBodySize: "25mb",
 
     serverActions: {
