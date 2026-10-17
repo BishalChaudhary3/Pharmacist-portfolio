@@ -13,17 +13,7 @@ import { ImageField } from "./image-field";
 import { useToast } from "@/hooks/use-toast";
 import { createArticle, updateArticle } from "@/lib/actions/articles";
 import { slugify } from "@/lib/utils";
-
-type MediaRecord = {
-  id: string;
-  url: string;
-  filename: string;
-  mimeType: string;
-  altText: string | null;
-  caption: string | null;
-  size: number;
-};
-
+import type { MediaRecord } from "@/lib/types/media";
 interface Category {
   id: string;
   name: string;

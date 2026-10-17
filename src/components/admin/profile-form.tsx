@@ -10,16 +10,7 @@ import { ImageField } from "./image-field";
 import { RichTextEditor } from "./rich-text-editor";
 import { updateProfile } from "@/lib/actions/profile";
 import { useToast } from "@/hooks/use-toast";
-
-type MediaRecord = {
-  id: string;
-  url: string;
-  filename: string;
-  mimeType: string;
-  altText: string | null;
-  caption: string | null;
-  size: number;
-};
+import type { MediaRecord } from "@/lib/types/media";
 
 interface ProfileFormProps {
   profile: {

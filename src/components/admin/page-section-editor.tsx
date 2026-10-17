@@ -47,17 +47,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useId } from "react";
-
-type MediaRecord = {
-  id: string;
-  url: string;
-  filename: string;
-  mimeType: string;
-  altText: string | null;
-  caption: string | null;
-  size: number;
-};
-
+import type { MediaRecord } from "@/lib/types/media";
 interface Section {
   id: string;
   type: string;
