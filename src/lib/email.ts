@@ -31,7 +31,7 @@ export async function sendContactNotification(data: {
   const resend = new Resend(apiKey);
 
   const { error } = await resend.emails.send({
-    from: "Portfolio Contact <noreply@yourdomain.com>",
+    from: "Portfolio Contact <onboarding@resend.dev>",
     to: contactEmail,
     subject: `Contact Form: ${data.subject}`,
     html: `
