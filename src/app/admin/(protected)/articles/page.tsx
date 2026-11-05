@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { ArticleStatusBadge } from "@/components/admin/article-status-badge";
-
+import { DeleteArticleButton } from "@/components/admin/delete-article-button";
 export default async function AdminArticlesPage({
   searchParams,
 }: {
@@ -76,13 +76,16 @@ export default async function AdminArticlesPage({
                     {formatDate(article.updatedAt)}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/articles/${article.id}/edit`}
-                      className="text-xs font-medium text-primary hover:underline"
-                    >
-                      Edit
-                    </Link>
-                  </td>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/admin/articles/${article.id}/edit`}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Edit
+                      </Link>
+                      <DeleteArticleButton id={article.id} title={article.title} />
+                    </div>
+                     </td>
                 </tr>
               ))}
             </tbody>
