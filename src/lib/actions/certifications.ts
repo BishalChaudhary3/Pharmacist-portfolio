@@ -36,6 +36,7 @@ export async function createCertification(formData: FormData) {
 
   revalidatePath("/admin/certifications");
   revalidatePath("/education");
+  revalidatePath("/certifications"); // ADDED THIS LINE
   return { success: true as const };
 }
 
@@ -66,6 +67,7 @@ export async function updateCertification(id: string, formData: FormData) {
 
   revalidatePath("/admin/certifications");
   revalidatePath("/education");
+  revalidatePath("/certifications"); // ADDED THIS LINE
   return { success: true as const };
 }
 
@@ -74,6 +76,7 @@ export async function deleteCertification(id: string) {
   await db.certification.delete({ where: { id } });
   revalidatePath("/admin/certifications");
   revalidatePath("/education");
+  revalidatePath("/certifications"); // ADDED THIS LINE
   return { success: true as const };
 }
 
@@ -85,6 +88,7 @@ export async function reorderCertifications(orderedIds: string[]) {
     )
   );
   revalidatePath("/admin/certifications");
+  revalidatePath("/certifications"); // ADDED THIS LINE
   return { success: true as const };
 }
 
@@ -93,5 +97,6 @@ export async function toggleCertification(id: string, enabled: boolean) {
   await db.certification.update({ where: { id }, data: { enabled } });
   revalidatePath("/admin/certifications");
   revalidatePath("/education");
+  revalidatePath("/certifications"); // ADDED THIS LINE
   return { success: true as const };
 }
