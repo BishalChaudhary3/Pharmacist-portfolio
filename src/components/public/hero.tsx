@@ -11,14 +11,6 @@ export function Hero({ content }: HeroProps) {
   const description =
     (content.description as string) ||
     "Evidence-based perspectives on medicines, pharmacy, and healthcare.";
-  const primaryButtonText =
-    (content.primaryButtonText as string) || "Read My Articles";
-  const primaryButtonUrl =
-    (content.primaryButtonUrl as string) || "/articles";
-  const secondaryButtonText =
-    (content.secondaryButtonText as string) || "About Me";
-  const secondaryButtonUrl =
-    (content.secondaryButtonUrl as string) || "/about";
 
   const coverImage = content.coverImage as
     | { url?: string; altText?: string }
@@ -38,20 +30,7 @@ export function Hero({ content }: HeroProps) {
             <p className="mt-6 text-body-lg text-text-muted text-pretty">
               {description}
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href={primaryButtonUrl}
-                className="inline-flex h-12 items-center rounded-md bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-              >
-                {primaryButtonText}
-              </a>
-              <a
-                href={secondaryButtonUrl}
-                className="inline-flex h-12 items-center rounded-md border border-border bg-surface px-6 text-sm font-medium text-text-primary transition-colors hover:bg-background"
-              >
-                {secondaryButtonText}
-              </a>
-            </div>
+            {/* The buttons were removed from here */}
           </div>
 
           <div className="relative isolate mx-auto w-full max-w-sm lg:max-w-md">
